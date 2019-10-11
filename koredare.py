@@ -62,6 +62,13 @@ def url_generator(name: str):
     return res
 
 
+@app.route("/_check/status")
+def status_check():
+    status = {"status": "ok"}
+    app.logger.info(status["status"])
+    return jsonify(status)
+
+
 @app.errorhandler(404)
 def no_such_human_pages(error):
     return "No such file or direcotory"
@@ -72,4 +79,4 @@ if __name__ == "__main__":
     FLASK_DEBUG_MODE = True
 
     # app.logger.disabled = False
-    # app.run(host=FLASK_HOST, port=FLASK_PORT, debug=FLASK_DEBUG_MODE)
+    app.run(host=FLASK_HOST, port=FLASK_PORT, debug=FLASK_DEBUG_MODE)
