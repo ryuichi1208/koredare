@@ -18,7 +18,7 @@ from flask import Flask, request, redirect, jsonify, abort
 
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage, TextSendMessage
+from linebot.models import MessageEvent, TextMessage, TextSendMessage, ImageSendMessage
 
 app = Flask(__name__)
 
@@ -103,9 +103,22 @@ def callback():
 def handle_message(event):
     rev_message = url_generator(event.message.text)
     app.logger.info("Recv message " + event.message.text)
-    linebot_api.reply_message(
-        event.reply_token, TextSendMessage(text="aaa")
+
+    # linebot_api.reply_message(
+    #     event.reply_token, TextSendMessage(text="aaa")
+    # )
+
+    image = {
+        image_url : f"https://koredare.herokuapp.com/static/Sample.png",
+        preview_image_url : f"https://koredare.herokuapp.com/static/Sample.png"
+    }
+
+    image_message = ImageSendMessage(
+        original_content_url=image["image_url"],
+        preview_image_url=image["preview_image_url"]
     )
+
+    linebot_api.reply_message(event.reply_token, image_message)
 
 
 @app.errorhandler(404)
