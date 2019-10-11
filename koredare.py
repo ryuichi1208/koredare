@@ -6,6 +6,7 @@ Everything is stuck here.
 """
 
 import aiohttp
+import datetime
 import itertools
 import numpy
 import os
@@ -25,16 +26,17 @@ app = Flask(__name__)
 LINE_BOT_ACCESS_TOKEN = os.getenv("LINE_BOT_ACCESS_TOKEN", None)
 LINE_BOT_CHANNEL_SECRET = os.getenv("LINE_BOT_CHANNEL_SECRET", None)
 
-if LINE_BOT_ACCESS_TOKEN is None or LINE_BOT_CHANNEL_SECRET is None:
-    app.logger.warn("Error : not set token...")
-    sys.exit(1)
-
-linebot_api = LineBotApi(LINE_BOT_ACCESS_TOKEN)
-handler = WebhookHandler(LINE_BOT_CHANNEL_SECRET)
+HEROKU_APP_NAME = os.getenv("HEROKU_APP_NAME", None)
 
 # class IllegalParameter(HTTPException):
 #     code = 400
 #     description = 'ILLIGAL PARAMETER'
+
+linebot_api = LineBotApi(LINE_BOT_ACCESS_TOKEN)
+handler = WebhookHandler(LINE_BOT_CHANNEL_SECRET)
+if LINE_BOT_ACCESS_TOKEN is None or LINE_BOT_CHANNEL_SECRET is None:
+    app.logger.warn("Error : not set token...")
+    sys.exit(1)
 
 
 def exec_http_requests(url: str):
@@ -81,7 +83,10 @@ def url_generator(name: str):
 
 @app.route("/_check/status")
 def status_check():
-    status = {"status": "ok"}
+    status = {
+        "date" : datetime.datetime.today().strftime("%Y/%m/%d %H:%M:%S"),
+        "status": "ok"
+    }
     app.logger.info(status["status"])
     return jsonify(status)
 
@@ -109,8 +114,8 @@ def handle_message(event):
     # )
 
     image = {
-        "image_url" : f"https://koredare.herokuapp.com/static/Sample.png",
-        "preview_image_url" : f"https://koredare.herokuapp.com/static/Sample.png"
+        "image_url" : f"{HEROKU_APP_NAME}/static/Sample.png",
+        "preview_image_url" : f"{HEROKU_APP_NAME}/static/Sample.png"
     }
 
     image_message = ImageSendMessage(
