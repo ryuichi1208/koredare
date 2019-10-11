@@ -22,6 +22,16 @@ from linebot.models import MessageEvent, TextMessage, TextSendMessage
 
 app = Flask(__name__)
 
+LINE_BOT_ACCESS_TOKEN = os.getenv("LINE_BOT_ACCESS_TOKEN", None)
+LINE_BOT_CHANNEL_SECRET = os.getenv("LINE_BOT_CHANNEL_SECRET", None)
+
+if LINE_BOT_ACCESS_TOKEN is None or LINE_BOT_CHANNEL_SECRET is None:
+    app.logger.warn("Error : not set token...")
+    sys.exit(1)
+
+linebot_api = LineBotApi(LINE_BOT_ACCESS_TOKEN)
+handler = WebhookHandler(LINE_BOT_CHANNEL_SECRET)
+
 # class IllegalParameter(HTTPException):
 #     code = 400
 #     description = 'ILLIGAL PARAMETER'
@@ -68,6 +78,20 @@ def status_check():
     status = {"status": "ok"}
     app.logger.info(status["status"])
     return jsonify(status)
+
+
+@app.route("/callback", methods=["POST"])
+def callback():
+    signature = request.headers["X-Line-Signature"]
+    body = request.get_data(as_text=True)
+    app.logger.info("Request body: " + body)
+
+    try:
+        handler.handle(body, signature)
+    except InvalidSignatureError:
+        abort(400)
+
+    return ok
 
 
 @app.errorhandler(404)
