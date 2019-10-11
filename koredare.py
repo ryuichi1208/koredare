@@ -6,6 +6,7 @@ Everything is stuck here.
 """
 
 import aiohttp
+import itertools
 import numpy
 import os
 import pprint
