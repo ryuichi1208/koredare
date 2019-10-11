@@ -36,6 +36,7 @@ handler = WebhookHandler(LINE_BOT_CHANNEL_SECRET)
 #     code = 400
 #     description = 'ILLIGAL PARAMETER'
 
+
 def exec_http_requests(url: str):
     print(url)
     try:
@@ -46,22 +47,27 @@ def exec_http_requests(url: str):
     except requests.exceptions.MissingSchema:
         return None
 
+
 def parse_html_file(res: str):
     pass
 
+
 def down_load_image(url: str):
     pass
+
 
 def decorate_args(func):
     """
     Decorator that removes the space between the last name and the name.
     """
+
     def or_dec_sepalate(*args, **kwargs):
         try:
             names = str(args[0]).replace(" ", "")
             func(names)
         except Exception:
             abort(404)
+
     return or_dec_sepalate
 
 
@@ -90,13 +96,20 @@ def callback():
         handler.handle(body, signature)
     except InvalidSignatureError:
         abort(400)
-
     return ok
+
+
+@handler.add(MessageEvent, message=TextMessage)
+def handle_message(even):
+    line_bot_api.reply_message(
+        event.reply_token, TextSendMessage(text=event.message.text)
+    )
 
 
 @app.errorhandler(404)
 def no_such_human_pages(error):
     return "No such file or direcotory"
+
 
 if __name__ == "__main__":
     FLASK_HOST = str(os.getenv("FLASK_HOST", "0.0.0.0"))
