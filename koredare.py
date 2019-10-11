@@ -15,6 +15,7 @@ import requests
 import sys
 
 from bs4 import BeautifulSoup
+from collections import OrderedDict
 from flask import Flask, request, redirect, jsonify, abort
 
 from linebot import LineBotApi, WebhookHandler
@@ -37,6 +38,13 @@ handler = WebhookHandler(LINE_BOT_CHANNEL_SECRET)
 if LINE_BOT_ACCESS_TOKEN is None or LINE_BOT_CHANNEL_SECRET is None:
     app.logger.warn("Error : not set token...")
     sys.exit(1)
+
+
+def wrapLog(func):
+    def _wrapLog():
+        print(datetime.now().strftime("%Y/%m/%d %H:%M:%S"), "call : ", func.__name__)
+        func()
+    return _wrapLog
 
 
 def exec_http_requests(url: str):
@@ -84,11 +92,11 @@ def url_generator(name: str):
 @app.route("/_check/status")
 def status_check():
     status = {
-        "date" : datetime.datetime.today().strftime("%Y/%m/%d %H:%M:%S"),
-        "status": "ok"
+        "date": datetime.datetime.today().strftime("%Y/%m/%d %H:%M:%S"),
+        "status": "ok",
     }
     app.logger.info(status["status"])
-    return jsonify(status)
+    return jsonify(OrderedDict(status))
 
 
 @app.route("/callback", methods=["POST"])
@@ -105,6 +113,7 @@ def callback():
 
 
 @handler.add(MessageEvent, message=TextMessage)
+@wrapLog
 def handle_message(event):
     rev_message = url_generator(event.message.text)
     app.logger.info("Recv message " + event.message.text)
@@ -114,13 +123,13 @@ def handle_message(event):
     # )
 
     image = {
-        "image_url" : f"{HEROKU_APP_NAME}/static/Sample.png",
-        "preview_image_url" : f"{HEROKU_APP_NAME}/static/Sample.png"
+        "image_url": f"{HEROKU_APP_NAME}/static/Sample.png",
+        "preview_image_url": f"{HEROKU_APP_NAME}/static/Sample.png",
     }
 
     image_message = ImageSendMessage(
         original_content_url=image["image_url"],
-        preview_image_url=image["preview_image_url"]
+        preview_image_url=image["preview_image_url"],
     )
 
     linebot_api.reply_message(event.reply_token, image_message)
