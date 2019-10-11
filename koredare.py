@@ -76,7 +76,7 @@ def url_generator(name: str):
     base_url = "https://ja.wikipedia.org/wiki"
     url = f"{base_url}/{name}"
     res = exec_http_requests(url)
-    return res
+    return "aaa"
 
 
 @app.route("/_check/status")
@@ -96,13 +96,15 @@ def callback():
         handler.handle(body, signature)
     except InvalidSignatureError:
         abort(400)
-    return ok
+    return "ok"
 
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
+    rev_message = url_generator(event.message.text)
     linebot_api.reply_message(
-        event.reply_token, TextSendMessage(text=event.message.text)
+
+        event.reply_token, TextSendMessage(text=rev_message)
     )
 
 
