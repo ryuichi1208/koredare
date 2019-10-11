@@ -116,8 +116,8 @@ def callback():
     return "ok"
 
 
-@handler.add(MessageEvent, message=TextMessage)
 @wrapLog
+@handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     rev_message = url_generator(event.message.text)
     app.logger.info("Recv message " + event.message.text)
