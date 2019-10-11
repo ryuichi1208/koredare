@@ -40,7 +40,7 @@ if LINE_BOT_ACCESS_TOKEN is None or LINE_BOT_CHANNEL_SECRET is None:
     sys.exit(1)
 
 
-def wrapLog(func):
+def call_func_time(func):
     def _wrapLog(*args, **kwargs):
         print(
             datetime.datetime.today().strftime("%Y/%m/%d %H:%M:%S"),
@@ -51,6 +51,7 @@ def wrapLog(func):
     return _wrapLog
 
 
+@call_func_time
 def exec_http_requests(url: str):
     app.logger.info("request url " + url)
     try:
@@ -62,10 +63,12 @@ def exec_http_requests(url: str):
         return None
 
 
+@call_func_time
 def parse_html_file(res: str):
     pass
 
 
+@call_func_time
 def down_load_image(url: str):
     pass
 
@@ -94,6 +97,7 @@ def url_generator(name: str):
 
 
 @app.route("/_check/status")
+@call_func_time
 def status_check():
     status = {
         "date": datetime.datetime.today().strftime("%Y/%m/%d %H:%M:%S"),
@@ -116,7 +120,7 @@ def callback():
     return "ok"
 
 
-@wrapLog
+@call_func_time
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     rev_message = url_generator(event.message.text)
