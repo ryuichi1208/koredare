@@ -42,8 +42,13 @@ if LINE_BOT_ACCESS_TOKEN is None or LINE_BOT_CHANNEL_SECRET is None:
 
 def wrapLog(func):
     def _wrapLog():
-        print(datetime.now().strftime("%Y/%m/%d %H:%M:%S"), "call : ", func.__name__)
+        print(
+            datetime.datetime.today().strftime("%Y/%m/%d %H:%M:%S"),
+            "call : ",
+            func.__name__,
+        )
         func()
+
     return _wrapLog
 
 
