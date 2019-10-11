@@ -25,6 +25,22 @@ app = Flask(__name__)
 #     code = 400
 #     description = 'ILLIGAL PARAMETER'
 
+def exec_http_requests(url: str):
+    print(url)
+    try:
+        res = requests.get(url)
+        if res.status_code == 404:
+            return None
+        return res.text
+    except requests.exceptions.MissingSchema:
+        return None
+
+def parse_html_file(res: str):
+    pass
+
+def down_load_image(url: str):
+    pass
+
 def decorate_args(func):
     """
     Decorator that removes the space between the last name and the name.
@@ -38,6 +54,14 @@ def decorate_args(func):
     return or_dec_sepalate
 
 
+@decorate_args
+def url_generator(name: str):
+    base_url = "https://ja.wikipedia.org/wiki"
+    url = f"{base_url}/{name}"
+    res = exec_http_requests(url)
+    return res
+
+
 @app.errorhandler(404)
 def no_such_human_pages(error):
     return "No such file or direcotory"
@@ -48,4 +72,4 @@ if __name__ == "__main__":
     FLASK_DEBUG_MODE = True
 
     # app.logger.disabled = False
-    app.run(host=FLASK_HOST, port=FLASK_PORT, debug=FLASK_DEBUG_MODE)
+    # app.run(host=FLASK_HOST, port=FLASK_PORT, debug=FLASK_DEBUG_MODE)
