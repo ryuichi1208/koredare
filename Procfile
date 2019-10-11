@@ -1,2 +1,1 @@
-/* web: uwsgi --ini uwsgi.ini */
-web: python koredare.py
+web: gunicorn koredare:app --log-file=-
