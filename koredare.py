@@ -109,8 +109,8 @@ def handle_message(event):
     # )
 
     image = {
-        image_url : f"https://koredare.herokuapp.com/static/Sample.png",
-        preview_image_url : f"https://koredare.herokuapp.com/static/Sample.png"
+        "image_url" : f"https://koredare.herokuapp.com/static/Sample.png",
+        "preview_image_url" : f"https://koredare.herokuapp.com/static/Sample.png"
     }
 
     image_message = ImageSendMessage(
