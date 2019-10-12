@@ -70,6 +70,7 @@ def parse_html_file(res: str):
     soup = BeautifulSoup(res, "lxml")
     image_list_org = soup.find_all("a", attrs={"class": "image"})
     image_list = [image_path for image_path in image_list_org if image_path.get("title") == "阿部 寛"]
+    print("aaa")
 
     if image_list is not None:
         image_url = image_list[0].find("img").get("srcset").split(",")[1].split()
