@@ -66,8 +66,6 @@ def call_func_time(func):
 def exec_http_requests(url: str):
     app.logger.info("request url " + url)
     url_a = "https://ja.wikipedia.org/wiki/%E9%98%BF%E9%83%A8%E5%AF%9B"
-    print(url)
-    print(url_a)
     try:
         res = requests.get(url)
         if res.status_code == 404:
@@ -114,7 +112,8 @@ def decorate_args(func):
     def or_dec_sepalate(*args, **kwargs):
         try:
             names = str(args[0]).replace(" ", "")
-            func(names)
+            names_enc = urllib.parse.quote(names)
+            func(names_enc)
         except Exception:
             abort(404)
 
@@ -124,8 +123,8 @@ def decorate_args(func):
 @decorate_args
 def url_generator(name: str):
     base_url = "https://ja.wikipedia.org/wiki"
-    name_en = urllib.parse.quote(name)
-    url = f"{base_url}/{name_en}"
+    url = f"{base_url}/{name}"
+    print(url)
     if exec_http_requests(url) == 1:
         abort(404)
 
