@@ -64,6 +64,7 @@ def call_func_time(func):
 @call_func_time
 def exec_http_requests(url: str):
     app.logger.info("request url " + url)
+    url = "https://ja.wikipedia.org/wiki/%E9%98%BF%E9%83%A8%E5%AF%9B"
     try:
         res = requests.get(url)
         if res.status_code == 404:
@@ -77,7 +78,7 @@ def exec_http_requests(url: str):
 def parse_html_file(res):
     soup = BeautifulSoup(res, "lxml")
     image_list_org = soup.find_all("a", attrs={"class": "image"})
-    image_list = [image_path for image_path in image_list_org if image_path.get("title") == "⠁"]
+    image_list = [image_path for image_path in image_list_org if image_path.get("title") == "阿部 寛"]
     print("img", image_list)
 
     if image_list is not None:
