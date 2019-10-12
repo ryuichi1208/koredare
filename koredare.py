@@ -156,9 +156,9 @@ def handle_message(event):
     rev_message = url_generator(event.message.text)
     app.logger.info("Recv message " + event.message.text)
 
-    linebot_api.reply_message(
-        event.reply_token, TextSendMessage(text="aaa")
-    )
+    # linebot_api.reply_message(
+    #     event.reply_token, TextSendMessage(text="aaa")
+    # )
 
     url_generator("阿部 寛")
 
