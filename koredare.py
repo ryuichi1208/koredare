@@ -67,16 +67,15 @@ def exec_http_requests(url: str):
 
 @call_func_time
 def parse_html_file(res):
-    print("aaa")
     soup = BeautifulSoup(res, "lxml")
-    print("bbb")
     image_list_org = soup.find_all("a", attrs={"class": "image"})
-    print("ccc")
     image_list = [image_path for image_path in image_list_org if image_path.get("title") == "阿部 寛"]
 
     if image_list is not None:
         image_url = image_list[0].find("img").get("srcset").split(",")[1].split()
-        down_load_image("https:" + image_url[0])
+        url = "https:" + image_url[0]
+        print(url)
+        down_load_image(url)
     else:
         print("No such image file...")
 
