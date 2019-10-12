@@ -14,6 +14,7 @@ import pprint
 import requests
 import shutil
 import sys
+import urllib.parse
 
 from bs4 import BeautifulSoup
 from collections import OrderedDict
@@ -64,7 +65,7 @@ def call_func_time(func):
 @call_func_time
 def exec_http_requests(url: str):
     app.logger.info("request url " + url)
-    url = "https://ja.wikipedia.org/wiki/%E9%98%BF%E9%83%A8%E5%AF%9B"
+    # url = "https://ja.wikipedia.org/wiki/%E9%98%BF%E9%83%A8%E5%AF%9B"
     try:
         res = requests.get(url)
         if res.status_code == 404:
@@ -121,7 +122,8 @@ def decorate_args(func):
 @decorate_args
 def url_generator(name: str):
     base_url = "https://ja.wikipedia.org/wiki"
-    url = f"{base_url}/{name}"
+    name_en = urllib.parse.quote(name)
+    url = f"{base_url}/{name_en}"
     if exec_http_requests(url) == 1:
         abort(404)
 
