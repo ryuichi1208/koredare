@@ -76,10 +76,8 @@ def exec_http_requests(url: str):
 @call_func_time
 def parse_html_file(res):
     soup = BeautifulSoup(res, "lxml")
-    print("soup", soup)
     image_list_org = soup.find_all("a", attrs={"class": "image"})
-    print("img_og", image_list_org)
-    image_list = [image_path for image_path in image_list_org if image_path.get("title") == "阿部 寛"]
+    image_list = [image_path for image_path in image_list_org if image_path.get("title") == "⠁"]
     print("img", image_list)
 
     if image_list is not None:
