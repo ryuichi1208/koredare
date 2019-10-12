@@ -65,7 +65,9 @@ def call_func_time(func):
 @call_func_time
 def exec_http_requests(url: str):
     app.logger.info("request url " + url)
-    # url = "https://ja.wikipedia.org/wiki/%E9%98%BF%E9%83%A8%E5%AF%9B"
+    url_a = "https://ja.wikipedia.org/wiki/%E9%98%BF%E9%83%A8%E5%AF%9B"
+    print(url)
+    print(url_a)
     try:
         res = requests.get(url)
         if res.status_code == 404:
