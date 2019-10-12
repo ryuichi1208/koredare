@@ -42,7 +42,13 @@ if LINE_BOT_ACCESS_TOKEN is None or LINE_BOT_CHANNEL_SECRET is None:
     app.logger.warn("Error : not set token...")
     sys.exit(1)
 
+
 class self_logger(object):
+    """
+    Logging class for normal processing of flasks.
+    Check heroku log as standard output is picked up.
+    """
+
     def __init__(self, log_level, message):
         self.log_level = log_level
         self.message = message
@@ -51,7 +57,12 @@ class self_logger(object):
         log = f"{[self.log_level]}: {message}"
         print(log)
 
+
 def call_func_time(func):
+    """
+    Collator for measuring function call time.
+    """
+
     def _wrapLog(*args, **kwargs):
         print(
             datetime.datetime.today().strftime("%Y/%m/%d %H:%M:%S"),
@@ -59,15 +70,23 @@ def call_func_time(func):
             func.__name__,
         )
         func(*args, **kwargs)
+
     return _wrapLog
 
 
 @call_func_time
-def exec_http_requests(url: str):
+def exec_http_requests(url: str, headers: dict = {}):
+    """
+    A function for issuing http requests.
+    Responsibility is sent to the caller since only 404 is handled after execution.
+    """
     app.logger.info("request url " + url)
-    url_a = "https://ja.wikipedia.org/wiki/%E9%98%BF%E9%83%A8%E5%AF%9B"
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5)",
+        "Keep-Alive": {"timeout": 15, "max": 100},
+    }
     try:
-        res = requests.get(url)
+        res = requests.get(url, headers=headers)
         if res.status_code == 404:
             return 1
         parse_html_file(res.text)
@@ -76,10 +95,12 @@ def exec_http_requests(url: str):
 
 
 @call_func_time
-def parse_html_file(res):
+def parse_html_file(res, name="阿部 寛"):
     soup = BeautifulSoup(res, "lxml")
     image_list_org = soup.find_all("a", attrs={"class": "image"})
-    image_list = [image_path for image_path in image_list_org if image_path.get("title") == "阿部 寛"]
+    image_list = [
+        image_path for image_path in image_list_org if image_path.get("title") == name
+    ]
     print("img", image_list)
 
     if image_list is not None:
@@ -132,6 +153,9 @@ def url_generator(name: str):
 @app.route("/_check/status")
 @call_func_time
 def status_check():
+    """
+    Endpoint for life and death monitoring.
+    """
     status = {
         "date": datetime.datetime.today().strftime("%Y/%m/%d %H:%M:%S"),
         "status": "ok",
@@ -142,6 +166,9 @@ def status_check():
 
 @app.route("/callback", methods=["POST"])
 def callback():
+    """
+    Callback function for sending a message.
+    """
     signature = request.headers["X-Line-Signature"]
     body = request.get_data(as_text=True)
     app.logger.info("Request body: " + body)
@@ -156,6 +183,10 @@ def callback():
 @call_func_time
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
+    """
+    Linebot's main processing function.
+    Searching and saving images are processed in different places.
+    """
     rev_message = url_generator(event.message.text)
     app.logger.info("Recv message " + event.message.text)
 
@@ -180,6 +211,9 @@ def handle_message(event):
 
 @app.errorhandler(404)
 def no_such_human_pages(error):
+    """
+    Error handling process when 404 occurs.
+    """
     return "No such file or direcotory"
 
 
