@@ -12,6 +12,7 @@ import numpy
 import os
 import pprint
 import requests
+import shutil
 import sys
 
 from bs4 import BeautifulSoup
@@ -28,6 +29,7 @@ LINE_BOT_ACCESS_TOKEN = os.getenv("LINE_BOT_ACCESS_TOKEN", None)
 LINE_BOT_CHANNEL_SECRET = os.getenv("LINE_BOT_CHANNEL_SECRET", None)
 
 HEROKU_APP_NAME = os.getenv("HEROKU_APP_NAME", None)
+HEROKU_IMAGE_DOWNDLOADS_DIR = os.getenv("HEROKU_IMAGE_DOWNDLOADS_DIR", "static")
 
 # class IllegalParameter(HTTPException):
 #     code = 400
@@ -57,20 +59,31 @@ def exec_http_requests(url: str):
     try:
         res = requests.get(url)
         if res.status_code == 404:
-            return None
-        return res.text
+            return 1
+        parse_html_file(res.text)
     except requests.exceptions.MissingSchema:
-        return None
+        return 1
 
 
 @call_func_time
 def parse_html_file(res: str):
-    pass
+    soup = BeautifulSoup(res, "lxml")
+    image_list_org = soup.find_all("a", attrs={"class": "image"})
+    image_list = [image_path for image_path in image_list_org if image_path.get("title") == "阿部 寛"]
+    image_url = image_list[0].find("img").get("srcset").split(",")[1].split()
+    down_load_image("https:" + image_url[0])
 
 
 @call_func_time
 def down_load_image(url: str):
-    pass
+    image_bin = requests.get(url, stream=True)
+
+    if image_bin.status_code == 200:
+        with open("static/test.jpg", "wb") as f:
+            image_bin.raw.decode_content = True
+            shutil.copyfileobj(image_bin.raw, f)
+    else:
+        abort(400)
 
 
 def decorate_args(func):
@@ -92,8 +105,8 @@ def decorate_args(func):
 def url_generator(name: str):
     base_url = "https://ja.wikipedia.org/wiki"
     url = f"{base_url}/{name}"
-    res = exec_http_requests(url)
-    return "aaa"
+    if exec_http_requests(url) == 1:
+        abort(404)
 
 
 @app.route("/_check/status")
@@ -126,13 +139,15 @@ def handle_message(event):
     rev_message = url_generator(event.message.text)
     app.logger.info("Recv message " + event.message.text)
 
-    # linebot_api.reply_message(
-    #     event.reply_token, TextSendMessage(text="aaa")
-    # )
+    linebot_api.reply_message(
+        event.reply_token, TextSendMessage(text="aaa")
+    )
+
+    url_generator("阿部 寛")
 
     image = {
-        "image_url": f"{HEROKU_APP_NAME}/static/Sample.png",
-        "preview_image_url": f"{HEROKU_APP_NAME}/static/Sample.png",
+        "image_url": f"{HEROKU_APP_NAME}/static/test.jpg",
+        "preview_image_url": f"{HEROKU_APP_NAME}/static/test.jpg",
     }
 
     image_message = ImageSendMessage(
