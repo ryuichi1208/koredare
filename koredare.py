@@ -41,6 +41,14 @@ if LINE_BOT_ACCESS_TOKEN is None or LINE_BOT_CHANNEL_SECRET is None:
     app.logger.warn("Error : not set token...")
     sys.exit(1)
 
+class self_logger(object):
+    def __init__(self, log_level, message):
+        self.log_level = log_level
+        self.message = message
+
+    def log_print(self):
+        log = f"{[self.log_level]}: {message}"
+        print(log)
 
 def call_func_time(func):
     def _wrapLog(*args, **kwargs):
@@ -82,6 +90,7 @@ def parse_html_file(res):
 
 @call_func_time
 def down_load_image(url: str):
+    self_logger("INFO", url)
     image_bin = requests.get(url, stream=True)
 
     if image_bin.status_code == 200:
