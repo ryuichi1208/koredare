@@ -3,6 +3,7 @@
 
 """
 Everything is stuck here.
+The images are downloaded from wikipedia.
 """
 
 import aiohttp
@@ -126,12 +127,40 @@ def down_load_image(url: str):
     self_logger("INFO", url)
     image_bin = requests.get(url, stream=True)
 
+    # response = requests.get(url, allow_redirects=False, timeout=timeout)
+    # if response.status_code != 200:
+    #     e = Exception("HTTP status: " + response.status_code)
+    #     raise e
+
+
     if image_bin.status_code == 200:
+        # Download in raw.
         with open("static/test.jpg", "wb") as f:
             image_bin.raw.decode_content = True
             shutil.copyfileobj(image_bin.raw, f)
     else:
+        """
+        Traceback (most recent call last):
+          File "requests/models.py", line 832, in raise_for_status
+            raise http_error
+        requests.exceptions.HTTPError: 404 Client Error
+
+        If the request exceeds the configured maximum number of redirects,
+        a TooManyRedirects exception is raised.
+        """
         abort(400)
+
+
+def make_filename(base_dir, number, url):
+    """
+    Create a file name to save the file.
+    Todo: generate a file name that matches the extension
+    """
+    ext = os.path.splitext(url)[1]
+    filename = number + ext
+
+    fullpath = os.path.join(base_dir, filename)
+    return fullpath
 
 
 def decorate_args(func):
@@ -218,12 +247,31 @@ def handle_message(event):
     linebot_api.reply_message(event.reply_token, image_message)
 
 
+@app.errorhandler(403)
 @app.errorhandler(404)
+@app.errorhandler(500)
 def no_such_human_pages(error):
     """
     Error handling process when 404 occurs.
     """
     return "No such file or direcotory"
+
+def __init(obj, org, bk):
+    pass
+    # with open(urls_txt, "r") as fin:
+    #     for line in fin:
+    #         url = line.strip()
+    #         filename = make_filename(images_dir, idx, url)
+
+    #         print "%s" % (url)
+    #         try:
+    #             image = download_image(url)
+    #             save_image(filename, image)
+    #             idx += 1
+    #         except KeyboardInterrupt:
+    #             break
+    #         except Exception as err:
+    #             print "%s" % (err)
 
 
 if __name__ == "__main__":
