@@ -8,5 +8,5 @@ aiohttp==3.6.1
 gunicorn==19.9.0
 bs4==0.0.1
 pprint==0.1
-lxml==4.6.2
+lxml==4.6.3
 urllib3==1.25.6
